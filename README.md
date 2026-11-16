@@ -1,12 +1,12 @@
 # Second Brain
 
-Персональная база знаний. Сейчас это код урока 19 (заметки, JWT в HttpOnly cookie, Next.js), разложенный в монорепо. Дальше — [docs/ROADMAP.md](docs/ROADMAP.md).
+## Предусловия
 
-Python-зависимости пока берутся из `~/Work/Python/Backend/.venv`. Свой `uv`/venv — задача T0.2.
+- Docker
+- Node.js
+- Python 3 и виртуальное окружение с зависимостями бэкенда. Перед командами API и миграций окружение должно быть активировано.
 
-## Локально
-
-### База
+## База
 
 Из корня репозитория:
 
@@ -14,30 +14,84 @@ Python-зависимости пока берутся из `~/Work/Python/Backen
 docker compose -f infra/compose.yaml up -d
 ```
 
-Postgres на порту `5433`, pgAdmin на `5051`. Учётка по умолчанию: `postgres` / `postgres`, база `notes_app`.
+Postgres слушает `localhost:5433`. База, пользователь и пароль — свои, те же, что в `backend/.env`.
 
-Скопируй примеры и подставь свои значения (файлы в git не попадают):
+pgAdmin: http://127.0.0.1:5051. Почту и пароль задай сам, в репозиторий их не клади.
+
+## Переменные окружения
+
+Файлы не коммитятся. Скопируй примеры и подставь значения ниже.
 
 ```bash
 cp backend/.env.example backend/.env
 cp backend/.env.supabase.example backend/.env.supabase
 ```
 
-Локальный `.env` должен смотреть на Docker: `POSTGRES_HOST=localhost`, `POSTGRES_PORT=5433`, `POSTGRES_DB=notes_app`, `POSTGRES_USER=postgres`, `POSTGRES_PASSWORD=postgres`.
+Локальный `backend/.env`:
 
-### Миграции и API
+```bash
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5433
+POSTGRES_DB=<database>
+POSTGRES_USER=<user>
+POSTGRES_PASSWORD=<password>
+
+APP_NAME=Notes API
+ENVIRONMENT=development
+
+JWT_COOKIE_NAME=access_token
+JWT_REFRESH_COOKIE_NAME=refresh_token
+JWT_SECRET=<secret>
+JWT_ALGORITHM=HS256
+JWT_ACCESS_EXPIRATION_TIME=900
+JWT_REFRESH_EXPIRATION_TIME=259200
+JWT_COOKIE_SECURE=false
+```
+
+Для локального HTTP оставь `JWT_COOKIE_SECURE=false`.
+
+`backend/.env.supabase` — те же поля, плюс хост своего проекта Supabase:
+
+```bash
+POSTGRES_HOST=<supabase-host>
+POSTGRES_PORT=5432
+POSTGRES_DB=<database>
+POSTGRES_USER=<user>
+POSTGRES_PASSWORD=<password>
+POSTGRES_SSLMODE=require
+
+APP_NAME=Notes API
+ENVIRONMENT=dev
+
+JWT_COOKIE_NAME=access_token
+JWT_REFRESH_COOKIE_NAME=refresh_token
+JWT_SECRET=<secret>
+JWT_ALGORITHM=HS256
+JWT_ACCESS_EXPIRATION_TIME=900
+JWT_REFRESH_EXPIRATION_TIME=259200
+JWT_COOKIE_SECURE=false
+```
+
+## API
+
+Из `backend`, с активированным виртуальным окружением:
 
 ```bash
 cd backend
-npm run migrate_db_local
-npm run local
+alembic upgrade head
+python main.py
 ```
 
 API: http://127.0.0.1:8000/docs
 
-Supabase: `npm run migrate_db_supabase`, затем `npm run supabase` (`DB_TARGET=supabase`, файл `.env.supabase`).
+Supabase, из того же каталога:
 
-### Фронт
+```bash
+DB_TARGET=supabase alembic upgrade head
+DB_TARGET=supabase python main.py
+```
+
+## Фронт
 
 ```bash
 cd frontend
@@ -45,13 +99,4 @@ npm install
 npm run dev
 ```
 
-UI: http://127.0.0.1:3000
-
-### Тесты
-
-Тесты ходят в локальный Postgres (`notes_pytest`), не в Supabase. Compose должен быть запущен, `backend/.env` — на этот Postgres.
-
-```bash
-cd backend
-../../Backend/.venv/bin/pytest -v
-```
+UI: http://127.0.0.1:3000. Запросы идут на http://localhost:8000.
