@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #f6f3ee;
+  --sheet: #faf8f5;
+  --recessed: #efece6;
+  --ink: #1c1917;
+  --muted: #78716c;
+  --faint: #a8a29e;
+  --moss: #1f4d3a;
+  --moss-hover: #16382b;
+  --line: #e5e0d8;
+  --line-strong: #dcd7ce;
+  --danger: #b91c1c;
+  --danger-bg: #fee2e2;
+  --danger-line: #fecaca;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-sheet: var(--sheet);
+  --color-recessed: var(--recessed);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-moss: var(--moss);
+  --color-moss-hover: var(--moss-hover);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-line: var(--danger-line);
+  --font-sans: var(--font-geist);
+  --font-serif: var(--font-newsreader);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-geist), sans-serif;
+}

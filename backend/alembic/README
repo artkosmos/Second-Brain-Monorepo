@@ -1,0 +1,12 @@
+Миграции схемы Postgres для урока 16.
+
+Из `lessons/lesson_16_17_sqlalchemy_and_bd_deploy/`:
+
+```bash
+alembic revision --autogenerate -m "описание"
+alembic upgrade head
+alembic downgrade -1
+alembic check
+```
+
+URL БД берётся из Settings (`.env`), не из `alembic.ini`.
