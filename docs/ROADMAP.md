@@ -67,7 +67,7 @@ flowchart LR
 - [ ] Критерии приёмки из карточки выполнены
 - [ ] Бэкенд покрыт тестами (успех + ошибки); `pytest` зелёный
 - [ ] `ruff check`, `ruff format --check`, `mypy` чистые
-- [ ] Фронт: `npm run lint` + `npm run build` проходят; фича видна в UI
+- [ ] Фронт: `pnpm lint` + `pnpm build` проходят; фича видна в UI
 - [ ] Миграции Alembic обратимы (`downgrade` работает) или в PR объяснено, почему нет
 - [ ] Нет секретов в git; новые env-переменные описаны в `.env.example`
 - [ ] UI доступен с клавиатуры, есть состояния loading / empty / error

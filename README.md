@@ -3,7 +3,7 @@
 ## Предусловия
 
 - Docker
-- Node.js
+- Node.js 22 и pnpm 12. Если `pnpm` нет в `PATH`: `corepack enable && corepack prepare pnpm@12.4.1 --activate`
 - Python 3 и виртуальное окружение с зависимостями бэкенда. Перед командами API и миграций окружение должно быть активировано.
 
 ## База
@@ -95,8 +95,8 @@ DB_TARGET=supabase python main.py
 
 ```bash
 cd frontend
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 UI: http://127.0.0.1:3000. Запросы идут на http://localhost:8000.
