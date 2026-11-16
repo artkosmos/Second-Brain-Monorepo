@@ -4,7 +4,7 @@
   "scripts": {
     "local": "../../Backend/.venv/bin/python main.py",
     "supabase": "DB_TARGET=supabase ../../Backend/.venv/bin/python main.py",
-    "frontend": "npm run dev --prefix ../frontend",
+    "frontend": "pnpm --dir ../frontend dev",
     "migrate_db_local": "../../Backend/.venv/bin/alembic upgrade head",
     "migrate_db_supabase": "DB_TARGET=supabase ../../Backend/.venv/bin/alembic upgrade head",
     "revision_db_supabase": "DB_TARGET=supabase ../../Backend/.venv/bin/alembic revision --autogenerate -m",
