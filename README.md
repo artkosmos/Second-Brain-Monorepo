@@ -20,13 +20,6 @@ pgAdmin: http://127.0.0.1:5051. Почту и пароль задай сам, в
 
 ## Переменные окружения
 
-Файлы не коммитятся. Скопируй примеры и подставь значения ниже.
-
-```bash
-cp backend/.env.example backend/.env
-cp backend/.env.supabase.example backend/.env.supabase
-```
-
 Локальный `backend/.env`:
 
 ```bash
@@ -50,7 +43,7 @@ JWT_COOKIE_SECURE=false
 
 Для локального HTTP оставь `JWT_COOKIE_SECURE=false`.
 
-`backend/.env.supabase` — те же поля, плюс хост своего проекта Supabase:
+`backend/.env.supabase.example` — шаблон окружения для доступа к удалённой базе на Supabase. Поля те же, что у локального `.env`, плюс `POSTGRES_SSLMODE=require` и хост проекта:
 
 ```bash
 POSTGRES_HOST=<supabase-host>
