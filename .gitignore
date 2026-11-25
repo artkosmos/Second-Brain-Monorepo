@@ -8,3 +8,4 @@ node_modules/
 *.tsbuildinfo
 .pytest_cache/
 .vscode/
+docs/
