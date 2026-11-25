@@ -51,7 +51,9 @@ def upgrade() -> None:
 
     if legacy_user_id:
         connection.execute(
-            sa.text("UPDATE notes SET owner_id = :legacy_user_id WHERE owner_id IS NULL"),
+            sa.text(
+                "UPDATE notes SET owner_id = :legacy_user_id WHERE owner_id IS NULL"
+            ),
             {"legacy_user_id": legacy_user_id},
         )
     op.alter_column("notes", "owner_id", existing_type=sa.Integer(), nullable=False)

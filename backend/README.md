@@ -2,13 +2,35 @@
 
 Скелет из 16/17. Auth: register/login ставят JWT в cookie; `/notes` только для владельца.
 
+## Запуск
+
+Из этого каталога `uv sync` создаёт `.venv` и ставит зависимости. `uv run` выполняет команду уже внутри него.
+
+```bash
+uv sync
+uv run alembic upgrade head
+uv run python main.py
+```
+
+Supabase: `DB_TARGET=supabase uv run alembic upgrade head`, затем `DB_TARGET=supabase uv run python main.py`. Те же команды есть в `Makefile`: `make local`, `make supabase`.
+
+## Проверки
+
+Конфиг в `pyproject.toml`. **ruff** проверяет ошибки и форматирует код. **mypy** в режиме strict проверяет типы; плагин `pydantic.mypy` понимает модели Pydantic.
+
+```bash
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy
+```
+
 ## Режимы БД
 
 | Режим | БД | Как |
 | ----- | -- | --- |
-| API → Supabase | remote + SSL | `.env.supabase` + `npm run supabase` |
-| тесты | local Docker `:5433` | `docker compose up -d` + `pytest -v` |
-| API → local | Docker `notes_app` | `.env` + `npm run local` |
+| API → Supabase | remote + SSL | `.env.supabase` + `make supabase` |
+| тесты | local Docker `:5433` | из корня: `docker compose -f infra/compose.yaml up -d`; в `backend`: `uv run pytest -v` |
+| API → local | Docker `notes_app` | `.env` + `make local` |
 
 Тесты **не** гонять в облако. Секреты только в `.env` / `.env.supabase` (gitignore).
 
@@ -35,11 +57,10 @@ JWT_COOKIE_SECURE=false
 ## Тесты
 
 ```bash
-# корень Backend
-docker compose up -d
+docker compose -f infra/compose.yaml up -d
 
-cd lessons/lesson_18_jwt
-pytest -v
+cd backend
+uv run pytest -v
 ```
 
 `pytest-postgresql` + `dependency_overrides` на `get_session`. `TestClient` хранит cookie jar после register/login.
@@ -47,26 +68,17 @@ pytest -v
 ## База / миграции
 
 ```bash
-# корень Backend
-docker compose up -d
+docker compose -f infra/compose.yaml up -d
 
 # local
-cd lessons/lesson_18_jwt
-alembic upgrade head
+cd backend
+uv run alembic upgrade head
 
 # Supabase
-DB_TARGET=supabase alembic upgrade head
+DB_TARGET=supabase uv run alembic upgrade head
 ```
 
 Если в `notes` уже есть строки, миграция `3a1afb64b26a` сама создаёт пользователя `legacy-notes@local` и проставляет его в `owner_id`, затем ставит `NOT NULL`. Пароль у этого пользователя нерабочий. На пустой таблице seed не создаётся.
-
-## Запуск API
-
-```bash
-cd lessons/lesson_18_jwt
-npm run local          # .env
-npm run supabase       # .env.supabase
-```
 
 Порт 8000, docs: http://127.0.0.1:8000/docs
 

@@ -1,6 +1,7 @@
 from typing import Literal
 
 from pydantic import BaseModel
+
 from schemas.errors import AppError, HTTPValidationError
 
 type ErrorStatusCode = Literal[404, 422, 500]

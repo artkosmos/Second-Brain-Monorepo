@@ -1,19 +1,21 @@
 from collections.abc import Iterator
 
 import pytest
-from config import get_settings
-from db.session import get_session
 from fastapi.testclient import TestClient
 from httpx2 import Response
-from main import app
 from psycopg import Connection
-from schemas.note import NoteCreate, NoteResponse
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import NullPool
+
+from config import get_settings
+from db.session import get_session
+from main import app
+from schemas.note import NoteCreate, NoteResponse
 from tests.db_url import postgres_url
 
 _jwt_cookie_name = get_settings().jwt_cookie_name
+_DEFAULT_TEST_PASSWORD = "secret123"
 
 
 @pytest.fixture
@@ -38,10 +40,12 @@ def db_session(postgresql: Connection) -> Iterator[Session]:
 
 
 @pytest.fixture
-def api_client(db_session: Session, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
+def api_client(
+    db_session: Session, monkeypatch: pytest.MonkeyPatch
+) -> Iterator[TestClient]:
     monkeypatch.setattr(get_settings(), "jwt_cookie_secure", False)
 
-    def override_get_session():
+    def override_get_session() -> Iterator[Session]:
         yield db_session
 
     app.dependency_overrides[get_session] = override_get_session
@@ -53,7 +57,9 @@ def api_client(db_session: Session, monkeypatch: pytest.MonkeyPatch) -> Iterator
         app.dependency_overrides.clear()
 
 
-def register_user(client: TestClient, email: str, password: str = "secret123") -> Response:
+def register_user(
+    client: TestClient, email: str, password: str = _DEFAULT_TEST_PASSWORD
+) -> Response:
     response = client.post(
         "/auth/register",
         json={"email": email, "password": password},
@@ -72,10 +78,12 @@ def auth_client(api_client: TestClient) -> TestClient:
 
 
 @pytest.fixture
-def other_auth_client(db_session: Session, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
+def other_auth_client(
+    db_session: Session, monkeypatch: pytest.MonkeyPatch
+) -> Iterator[TestClient]:
     monkeypatch.setattr(get_settings(), "jwt_cookie_secure", False)
 
-    def override_get_session():
+    def override_get_session() -> Iterator[Session]:
         yield db_session
 
     app.dependency_overrides[get_session] = override_get_session
@@ -97,8 +105,12 @@ def created_note_sample() -> NoteCreate:
 
 
 @pytest.fixture
-def created_note(auth_client: TestClient, created_note_sample: NoteCreate) -> NoteResponse:
-    response: Response = auth_client.post(url="/notes", json=created_note_sample.model_dump())
+def created_note(
+    auth_client: TestClient, created_note_sample: NoteCreate
+) -> NoteResponse:
+    response: Response = auth_client.post(
+        url="/notes", json=created_note_sample.model_dump()
+    )
     assert response.status_code == 201
 
     return NoteResponse.model_validate(response.json())

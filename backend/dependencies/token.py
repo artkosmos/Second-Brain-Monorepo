@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import Depends
+
 from security.token import (
     get_refresh_token_payload_from_cookie,
     get_token_payload_from_cookie,

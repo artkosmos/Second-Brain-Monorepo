@@ -1,8 +1,9 @@
 from datetime import datetime
 from typing import Annotated
 
-from models import NoteDraft, NotePatchDraft, NoteUpdateDraft
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
+
+from models import NoteDraft, NotePatchDraft, NoteUpdateDraft
 
 # Non-empty tag string after trimming whitespace.
 Tag = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
@@ -37,7 +38,7 @@ class NoteUpdate(NoteCreate):
     Same required fields as NoteCreate; id comes from the path.
     """
 
-    def to_draft(self, note_id: int) -> NoteUpdateDraft:
+    def to_update_draft(self, note_id: int) -> NoteUpdateDraft:
         return NoteUpdateDraft(id=note_id, title=self.title, content=self.content)
 
 
@@ -47,12 +48,16 @@ class NotePatch(BaseModel):
     Only sent fields are applied. At least one field is required.
     """
 
-    title: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)] | None = None
-    content: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)] | None = None
+    title: (
+        Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)] | None
+    ) = None
+    content: (
+        Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)] | None
+    ) = None
     # tags: list[Tag] | None = None
 
     @model_validator(mode="after")
-    def at_least_one_field(self):
+    def at_least_one_field(self) -> NotePatch:
         """Reject an empty patch body (no fields were set)."""
 
         if not bool(self.model_dump(exclude_unset=True)):

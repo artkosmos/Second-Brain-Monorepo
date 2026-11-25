@@ -1,7 +1,8 @@
 import asyncio
 
-from dependencies.settings import SettingsDep
 from fastapi import APIRouter
+
+from dependencies.settings import SettingsDep
 from schemas.api import AppInfoResponse, HealthResponse
 
 router = APIRouter()

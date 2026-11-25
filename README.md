@@ -4,7 +4,7 @@
 
 - Docker
 - Node.js 22 и pnpm 12. Если `pnpm` нет в `PATH`: `corepack enable && corepack prepare pnpm@12.4.1 --activate`
-- Python 3 и виртуальное окружение с зависимостями бэкенда. Перед командами API и миграций окружение должно быть активировано.
+- Python 3. Из `backend` один раз `uv sync` (нужен бинарь `uv`; окружение появится в `backend/.venv`).
 
 ## База
 
@@ -67,21 +67,23 @@ JWT_COOKIE_SECURE=false
 
 ## API
 
-Из `backend`, с активированным виртуальным окружением:
-
 ```bash
 cd backend
-alembic upgrade head
-python main.py
+uv sync
+uv run alembic upgrade head
+uv run python main.py
 ```
 
 API: http://127.0.0.1:8000/docs
 
-Supabase, из того же каталога:
+Те же команды есть в `backend/Makefile`: `make migrate-local`, `make local`, `make migrate-supabase`, `make supabase`.
+
+Supabase:
 
 ```bash
-DB_TARGET=supabase alembic upgrade head
-DB_TARGET=supabase python main.py
+cd backend
+DB_TARGET=supabase uv run alembic upgrade head
+DB_TARGET=supabase uv run python main.py
 ```
 
 ## Фронт
