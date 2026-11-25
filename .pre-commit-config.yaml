@@ -19,3 +19,4 @@ repos:
     hooks:
       - id: check-added-large-files
       - id: detect-private-key
+      - id: no-commit-to-branch
