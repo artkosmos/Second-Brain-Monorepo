@@ -1,13 +1,15 @@
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 import uvicorn
 from alembic.command import check
 from alembic.config import Config
-from exceptions.handlers import register_exception_handlers
-from exceptions.http_responses import ERROR_RESPONSES_SCHEMAS
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from exceptions.handlers import register_exception_handlers
+from exceptions.http_responses import ERROR_RESPONSES_SCHEMAS
 from routers.health import router as health_router
 from routers.notes import router as notes_router
 from routers.security import router as security_router
@@ -17,7 +19,7 @@ _ALEMBIC_DIR = Path(__file__).resolve().parent
 
 
 @asynccontextmanager
-async def lifespan(_app: FastAPI):
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     check(Config(_ALEMBIC_DIR / "alembic.ini"))
     yield
 

@@ -1,19 +1,20 @@
 from dataclasses import asdict, dataclass
 
+from sqlalchemy.orm import Session
+from sqlalchemy.sql import or_, select
+
 from db.models import NotesORM
 from dependencies.session import SessionDep
 from exceptions.not_found_error import raise_not_found_note_error
 from exceptions.storage_error import catch_storage_error
 from models import NoteDraft, NotePatchDraft, NoteUpdateDraft
-from sqlalchemy.orm import Session
-from sqlalchemy.sql import or_, select
 
 
 @dataclass
 class NotesRepository:
     session: Session
 
-    def get_notes(self, user_id):
+    def get_notes(self, user_id: int) -> list[NotesORM]:
         with catch_storage_error():
             stmt = select(NotesORM).where(NotesORM.owner_id == user_id)
 
@@ -49,7 +50,9 @@ class NotesRepository:
 
             return note
 
-    def patch_update_note(self, user_id: int, id: int, draft_fields: NotePatchDraft) -> NotesORM:
+    def patch_update_note(
+        self, user_id: int, id: int, draft_fields: NotePatchDraft
+    ) -> NotesORM:
         with catch_storage_error():
             note = self.session.get(NotesORM, id)
 

@@ -1,6 +1,7 @@
+from fastapi import APIRouter
+
 from dependencies.notes import RepositoryDep
 from dependencies.user import CurrentUserDep
-from fastapi import APIRouter
 from schemas.note import NoteCreate, NotePatch, NoteResponse, NoteUpdate
 
 router = APIRouter(prefix="/notes", tags=["Notes 📒"])
@@ -42,7 +43,7 @@ async def update_note(
     repository: RepositoryDep,
 ) -> NoteResponse:
     return NoteResponse.model_validate(
-        repository.update_note(user.id, payload.to_draft(note_id))
+        repository.update_note(user.id, payload.to_update_draft(note_id))
     )
 
 

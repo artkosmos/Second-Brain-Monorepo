@@ -1,6 +1,5 @@
 from config import Settings
 from repositories.refresh_tokens import RefreshTokensRepository
-
 from security.token import create_refresh_token
 from security.types import TokenPayload
 

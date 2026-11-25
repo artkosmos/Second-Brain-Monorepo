@@ -1,21 +1,31 @@
-from config import get_settings
-from db.models import Base
 from pytest_postgresql import factories
 from sqlalchemy import create_engine
 
+from config import get_settings
+from db.models import Base
 from tests.db_url import postgres_url
 
 _settings = get_settings()
 
 
-def _load_schema(**kwargs) -> None:
+def _load_schema(
+    *,
+    host: str,
+    port: str | int,
+    user: str,
+    dbname: str,
+    password: str | None,
+    autocommit: bool,
+) -> None:
+    # pytest-postgresql always passes autocommit; create_all does not use it.
+    del autocommit
     engine = create_engine(
         postgres_url(
-            user=kwargs["user"],
-            password=kwargs["password"],
-            host=kwargs["host"],
-            port=kwargs["port"],
-            dbname=kwargs["dbname"],
+            user=user,
+            password=password,
+            host=host,
+            port=port,
+            dbname=dbname,
         )
     )
     Base.metadata.create_all(engine)

@@ -1,6 +1,7 @@
 from typing import Annotated
 
-from config import Settings, get_settings
 from fastapi import Depends
+
+from config import Settings, get_settings
 
 type SettingsDep = Annotated[Settings, Depends(get_settings)]

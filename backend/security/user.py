@@ -1,7 +1,8 @@
+from fastapi import HTTPException
+
 from db.models import UsersORM
 from dependencies.session import SessionDep
 from dependencies.token import TokenPayloadDep
-from fastapi import HTTPException
 
 
 def get_current_user(session: SessionDep, token_payload: TokenPayloadDep) -> UsersORM:

@@ -2,17 +2,19 @@ from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
 import jwt
+from fastapi import HTTPException, Response
+
 from config import Settings
 from dependencies.cookie import AccessTokenDep, RefreshTokenDep
 from dependencies.settings import SettingsDep
-from fastapi import HTTPException, Response
-
 from security.types import RefreshToken, RefreshTokenPayload, TokenPayload
 
 
 def decode_token(token: str, settings: SettingsDep) -> TokenPayload:
     try:
-        payload = jwt.decode(token, key=settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+        payload = jwt.decode(
+            token, key=settings.jwt_secret, algorithms=[settings.jwt_algorithm]
+        )
 
         if payload.get("type") == "refresh":
             raise jwt.InvalidTokenError
@@ -22,18 +24,24 @@ def decode_token(token: str, settings: SettingsDep) -> TokenPayload:
         raise HTTPException(status_code=401, detail="Invalid token") from error
 
 
-def get_token_payload_from_cookie(settings: SettingsDep, token: AccessTokenDep) -> TokenPayload:
+def get_token_payload_from_cookie(
+    settings: SettingsDep, token: AccessTokenDep
+) -> TokenPayload:
     return decode_token(token, settings)
 
 
 def decode_refresh_token(token: str, settings: Settings) -> RefreshTokenPayload:
     try:
-        payload = jwt.decode(token, key=settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+        payload = jwt.decode(
+            token, key=settings.jwt_secret, algorithms=[settings.jwt_algorithm]
+        )
 
         if payload.get("type") != "refresh":
             raise jwt.InvalidTokenError
 
-        return RefreshTokenPayload(user_id=int(payload["sub"]), jti=UUID(payload["jti"]))
+        return RefreshTokenPayload(
+            user_id=int(payload["sub"]), jti=UUID(payload["jti"])
+        )
     except (jwt.InvalidTokenError, KeyError, ValueError) as error:
         raise HTTPException(status_code=401, detail="Invalid token") from error
 
@@ -54,7 +62,9 @@ def create_access_token(data: TokenPayload, settings: Settings) -> str:
         "iat": created_at,
     }
 
-    return jwt.encode(payload=payload, key=settings.jwt_secret, algorithm=settings.jwt_algorithm)
+    return jwt.encode(
+        payload=payload, key=settings.jwt_secret, algorithm=settings.jwt_algorithm
+    )
 
 
 def create_refresh_token(data: TokenPayload, settings: Settings) -> RefreshToken:
@@ -69,7 +79,9 @@ def create_refresh_token(data: TokenPayload, settings: Settings) -> RefreshToken
         "jti": str(jti),
         "type": "refresh",
     }
-    token = jwt.encode(payload=payload, key=settings.jwt_secret, algorithm=settings.jwt_algorithm)
+    token = jwt.encode(
+        payload=payload, key=settings.jwt_secret, algorithm=settings.jwt_algorithm
+    )
 
     return RefreshToken(token=token, jti=jti, expires_at=expire)
 

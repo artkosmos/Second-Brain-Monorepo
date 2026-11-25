@@ -1,3 +1,8 @@
+from fastapi import APIRouter, HTTPException, Response
+from pwdlib import PasswordHash
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.sql import select
+
 from db.models import UsersORM
 from dependencies.cookie import LogoutRefreshTokenDep
 from dependencies.refresh_tokens import RefreshTokensRepositoryDep
@@ -5,8 +10,6 @@ from dependencies.session import SessionDep
 from dependencies.settings import SettingsDep
 from dependencies.token import RefreshTokenPayloadDep
 from exceptions.storage_error import catch_storage_error
-from fastapi import APIRouter, HTTPException, Response
-from pwdlib import PasswordHash
 from schemas.security import LoginRequest, RegistrationRequest
 from security.session import add_refresh_token
 from security.token import (
@@ -16,8 +19,6 @@ from security.token import (
     set_auth_cookies,
 )
 from security.types import TokenPayload
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.sql import select
 
 router = APIRouter(prefix="/auth", tags=["Auth 🔒"])
 password_hash = PasswordHash.recommended()
@@ -65,7 +66,8 @@ async def register(
         raise HTTPException(status_code=409, detail="User already exists")
 
     new_user = UsersORM(
-        email=payload.email, hashed_password=password_hash.hash(payload.password.get_secret_value())
+        email=payload.email,
+        hashed_password=password_hash.hash(payload.password.get_secret_value()),
     )
     session.add(new_user)
 
@@ -76,7 +78,9 @@ async def register(
             session.commit()
         except IntegrityError as error:
             session.rollback()
-            raise HTTPException(status_code=409, detail="User already exists") from error
+            raise HTTPException(
+                status_code=409, detail="User already exists"
+            ) from error
 
     set_auth_cookies(
         response=response,

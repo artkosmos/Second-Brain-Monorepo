@@ -1,5 +1,6 @@
-from dependencies.user import CurrentUserDep
 from fastapi import APIRouter
+
+from dependencies.user import CurrentUserDep
 from schemas.security import UserResponse
 
 router = APIRouter(prefix="/user", tags=["User 🧑"])
